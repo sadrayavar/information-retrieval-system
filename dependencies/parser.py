@@ -17,7 +17,8 @@ def doc_parser(path, log=False):
             temp_list = file.read()
             temp_list = word_tokenize(temp_list)
             temp_list = remove_symbol(temp_list)
-            temp_list = stem(temp_list)
+            temp_list = lower(temp_list)
+            # temp_list = stem(temp_list)
 
             # creating token entity with token, doc_id, and tkn_pos keys
             for tkn_pos in range(len(temp_list)):
@@ -28,6 +29,10 @@ def doc_parser(path, log=False):
                 }
             token_list += temp_list
     return token_list
+
+
+def lower(tkn_list):
+    return [tkn.lower() for tkn in tkn_list]
 
 
 def remove_symbol(tkn_list):

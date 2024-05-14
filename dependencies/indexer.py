@@ -1,4 +1,5 @@
 import os, json
+from dependencies.common_funcs import delete_files
 
 
 class Indexer:
@@ -13,13 +14,15 @@ class Indexer:
         dictionary: dictionary of term with their frequency and posting list path
     """
 
+    dic_path = "dictionary"
+
     def __init__(self, tkn_list, post_dir, log):
         self.log = log
         self.dict = {}
         log("Started to execute indexer")
 
         # delete all of posting list files
-        self.delete_files(post_dir)
+        delete_files(post_dir)
 
         for tkn_entity in tkn_list:
             token = tkn_entity["token"]
@@ -27,17 +30,15 @@ class Indexer:
             tkn_pos = tkn_entity["tkn_pos"]
             post_file = f"{post_dir}/{token}.json"
 
-            self.process_token(token, post_file)
+            self.add_token(token, post_file)
 
-            self.process_posting(str(doc_id), tkn_pos, post_file)
+            self.add_posting(str(doc_id), tkn_pos, post_file)
 
-    def delete_files(self, directory):
-        for filename in os.listdir(directory):
-            # Create the full path to the file
-            filepath = os.path.join(directory, filename)
-            os.remove(filepath)
+        # create file
+        with open(f"{self.dic_path}/positional.json", "w") as file:
+            json.dump(self.dict, file, indent=4)
 
-    def process_token(self, token, post_file):
+    def add_token(self, token, post_file):
         # add token to dictionary (if does not exist)
         if token not in self.dict:
             self.create_posting(token, post_file)
@@ -59,7 +60,7 @@ class Indexer:
         with open(post_path, "w") as file:
             json.dump({}, file)
 
-    def process_posting(self, doc_id, tkn_pos, post_file):
+    def add_posting(self, doc_id, tkn_pos, post_file):
         posting = {}
 
         with open(post_file, "r") as file:
