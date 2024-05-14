@@ -6,6 +6,15 @@ nltk.download("punkt")
 
 
 def pre_process_docs(path, log):
+    """_summary_
+
+    Args:
+        path (string): the directory in which text files exist
+        log (function): logging function for this session
+
+    Returns:
+        list: list fo dictionaries with token, doc_id, and tkn_id keys
+    """
     log("Started to execute pre_process")
 
     token_list = []
@@ -16,8 +25,12 @@ def pre_process_docs(path, log):
             temp_list = pre_process_query(file.read(), log)
 
             # append document id for saving on posting list
-            for token_id in range(len(temp_list)):
-                temp_list[token_id] = (temp_list[token_id], doc_id, token_id)
+            for tkn_id in range(len(temp_list)):
+                temp_list[tkn_id] = {
+                    "token": temp_list[tkn_id],
+                    "doc_id": doc_id,
+                    "tkn_id": tkn_id,
+                }
 
             token_list += temp_list
 
