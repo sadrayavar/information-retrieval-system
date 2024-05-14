@@ -13,7 +13,7 @@ def pre_process_docs(path, log):
         log (function): logging function for this session
 
     Returns:
-        list: list fo dictionaries with token, doc_id, and tkn_id keys
+        list: list fo dictionaries with token, doc_id, and tkn_pos keys
     """
     log("Started to execute pre_process")
 
@@ -21,15 +21,15 @@ def pre_process_docs(path, log):
 
     for doc_id in range(5):
         with open(f"{path}/{doc_id}.text", "r") as file:
-            # read file and pass it to the query pre_proessor
+            # read file and pass it to the query_pre_proessor
             temp_list = pre_process_query(file.read(), log)
 
-            # append document id for saving on posting list
-            for tkn_id in range(len(temp_list)):
-                temp_list[tkn_id] = {
-                    "token": temp_list[tkn_id],
+            # creating token entity with token, doc_id, and tkn_pos keys
+            for tkn_pos in range(len(temp_list)):
+                temp_list[tkn_pos] = {
+                    "token": temp_list[tkn_pos],
                     "doc_id": doc_id,
-                    "tkn_id": tkn_id,
+                    "tkn_pos": tkn_pos,
                 }
 
             token_list += temp_list

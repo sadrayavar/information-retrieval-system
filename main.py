@@ -1,6 +1,6 @@
 from dependencies.log import Log
 from dependencies.pre_process import pre_process_docs, pre_process_query
-from dependencies.indexer import indexer
+from dependencies.indexer import Indexer
 
 
 class Main:
@@ -14,12 +14,16 @@ class Main:
         # initializing logging system
         self.log = Log().log
 
+        # pre-process documents
         tokens = pre_process_docs(self.paths["document"], self.log)
-        self.dictionary = indexer(tokens, self.paths["posting"], self.log)
-        print(self.dictionary)
-        # while True:
-        #     self.take_query()
-        #     self.rank_results()
+
+        # index documents
+        indx = Indexer(tokens, self.paths["posting"], self.log)
+        self.dict = indx.dict
+
+        while True:
+            self.take_query()
+            self.rank_results()
 
     def take_query(self):
         self.log("Started to execute take_query")
