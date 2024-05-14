@@ -1,5 +1,5 @@
 from dependencies.log import Log
-from dependencies.pre_process import pre_process_docs, pre_process_query
+from dependencies.parser import doc_parser, query_parser
 from dependencies.indexer import Indexer
 
 
@@ -15,19 +15,17 @@ class Main:
         self.log = Log().log
 
         # pre-process documents
-        tokens = pre_process_docs(self.paths["document"], self.log)
+        tokens = doc_parser(self.paths["document"], self.log)
 
         # index documents
         indx = Indexer(tokens, self.paths["posting"], self.log)
         self.dict = indx.dict
 
         while True:
-            self.take_query()
-            self.rank_results()
+            (input("Please enter your query: "))
+            query_parser()
 
-    def take_query(self):
-        self.log("Started to execute take_query")
-        input()
+            self.rank_results()
 
     def rank_results(self):
         self.log("Started to execute rank_results")
