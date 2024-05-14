@@ -6,7 +6,7 @@ class Log:
     def __init__(self):
         # create logs folder in current path
         current_path = os.path.dirname(os.path.abspath(__file__))
-        log_folder_path = os.path.join(current_path, "logs")
+        log_folder_path = os.path.join(current_path, "..", "logs")
         if not os.path.exists(log_folder_path):
             os.makedirs(log_folder_path)
 
