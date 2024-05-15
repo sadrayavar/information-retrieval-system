@@ -14,9 +14,7 @@ class Indexer:
         dictionary: dictionary of term with their frequency and posting list path
     """
 
-    dic_path = "dictionary"
-
-    def __init__(self, tkn_list, post_dir, log):
+    def __init__(self, tkn_list, post_dir, dict_path, log):
         self.log = log
         self.dict = {}
         log("Started to execute indexer")
@@ -35,7 +33,7 @@ class Indexer:
             self.add_posting(str(doc_id), tkn_pos, post_file)
 
         # create file
-        with open(f"{self.dic_path}/positional.json", "w") as file:
+        with open(f"{dict_path}/positional.json", "w") as file:
             json.dump(self.dict, file, indent=4)
 
     def add_token(self, token, post_file):
