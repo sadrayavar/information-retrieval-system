@@ -1,13 +1,13 @@
 from dependencies.log import Log
 from dependencies.document_parser import doc_parser
-from dependencies.query_resolver import query_parser
+from dependencies.query_resolver import QueryResolver
 from dependencies.indexer import Indexer
 from dependencies.wildcard import KgramIndexer
 
 
 class Main:
-    dict = {}
-    wildcard_dict = {}
+    positional = {}
+    wildcard = {}
     paths = {
         "document": "Database/Documents",
         "log": "Database/Logs",
@@ -24,21 +24,23 @@ class Main:
         tokens = doc_parser(self.paths["document"], self.log)
 
         # index documents
-        indxr = Indexer(tokens, self.paths["posting"], self.paths["dict"], self.log)
-        self.dict = indxr.dict
+        self.positional = Indexer(
+            tokens, self.paths["posting"], self.paths["dict"], self.log
+        ).result
 
         # # create wildcard matcher
         # matcher = Indexer(tokens, 1, self.log)
         # self.dict = indxr.dict
 
         # wildcard indexer
-        wildcard = KgramIndexer(self.dict, self.paths["dict"], self.log)
-        self.wildcard_dict = wildcard.dict
+        self.wildcard = KgramIndexer(
+            self.positional, self.paths["dict"], self.log
+        ).result
 
         while True:
             query = input("Please enter your query: ")
-            results = query_parser(query)
-            print("results are: ", results)
+            results = QueryResolver(query, self.positional).results
+            print(results)
 
 
 Main()
