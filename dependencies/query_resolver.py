@@ -20,20 +20,25 @@ class QueryResolver:
         for i in range(len(tkn_list)):
             tkn = tkn_list[i]
 
+            # ignores "AND" since its default operator is AND
+            if "AND" in tkn:
+                continue
+
+            if "OR" in tkn:
+                pass
+
             tkn = word_tokenize(tkn)
             tkn = remove_symbol(tkn)
             tkn = lower(tkn)
-            tkn = stem(tkn)
-            tkn = [tkn["stemed"] for tkn in tkn]
+            tkn = [tkn["stemed"] for tkn in stem(tkn)]
             result += tkn
 
         return self.get_results(result)
 
     def get_results(self, tkns):
         content = {}
-        results = {}
 
-        # save contents
+        # load posting list contents
         for tkn in tkns:
             with open(self.positional[tkn]["path"], "r") as file:
                 content[tkn] = json.load(file)
@@ -45,12 +50,11 @@ class QueryResolver:
                     list = content[tkn][str(doc_id)]
                     list_of_lists.append(list)
                 else:
+                    list_of_lists = []
                     break
 
             if len(list_of_lists) > 0:
-                results[doc_id] = FindRecursive(list_of_lists).results
-
-        self.results = results
+                self.results[doc_id] = FindRecursive(list_of_lists).results
 
     def my_tokenize(self, sentence):
         tkn_list = []
@@ -81,19 +85,3 @@ class QueryResolver:
         elif len(second) == 0:
             return first
         return list(set(first) & set(second))
-
-
-## a = query_parser("a")
-## a = query_parser("video game")
-# a = query_parser("video OR game")
-# a = query_parser("video NOT game")
-# a = query_parser("games,")
-# a = query_parser(",games")
-# a = query_parser("games have")
-# a = query_parser("ga*")
-# a = query_parser("*es")
-# a = query_parser("ga*es")
-# a = query_parser("ga*es have")
-# a = query_parser("games \\4 border")
-# a = query_parser("games \\4 bo*")
-# print(a)
