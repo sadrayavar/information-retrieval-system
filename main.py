@@ -21,26 +21,20 @@ class Main:
         self.log = Log(self.paths["log"]).log
 
         # pre-process documents
-        tokens = doc_parser(self.paths["document"], self.log)
+        tkns_entity = doc_parser(self.paths["document"], self.log)
 
         # index documents
         self.positional = PositionalIndexer(
-            tokens, self.paths["posting"], self.paths["dict"], self.log
+            tkns_entity, self.paths["posting"], self.paths["dict"], self.log
         ).result
 
-        # # create wildcard matcher
-        # matcher = Indexer(tokens, 1, self.log)
-        # self.dict = indxr.dict
-
         # wildcard indexer
-        self.wildcard = KgramIndexer(tokens, self.paths["dict"], self.log).result
+        self.wildcard = KgramIndexer(tkns_entity, self.paths["dict"], self.log).result
 
         while True:
-            query = input("Please enter your query: ")
-            results = QueryResolver(
-                query, self.positional, self.wildcard, self.log
-            ).results
-            print(results)
+            print("\n#####################################")
+            query = input("Please enter your query: ").strip()
+            QueryResolver(query, self.positional, self.wildcard, self.log)
 
 
 Main()

@@ -35,6 +35,10 @@
         "path": "Database/Posting List/adapt.json",
         "freq": 1
     },
+    "adrenalin": {
+        "path": "Database/Posting List/adrenalin.json",
+        "freq": 1
+    },
     "advanc": {
         "path": "Database/Posting List/advanc.json",
         "freq": 2
@@ -339,6 +343,10 @@
         "path": "Database/Posting List/continu.json",
         "freq": 2
     },
+    "coral": {
+        "path": "Database/Posting List/coral.json",
+        "freq": 1
+    },
     "craft": {
         "path": "Database/Posting List/craft.json",
         "freq": 1
@@ -419,6 +427,10 @@
         "path": "Database/Posting List/dream.json",
         "freq": 1
     },
+    "driven": {
+        "path": "Database/Posting List/driven.json",
+        "freq": 1
+    },
     "dure": {
         "path": "Database/Posting List/dure.json",
         "freq": 2
@@ -459,6 +471,10 @@
         "path": "Database/Posting List/encourag.json",
         "freq": 2
     },
+    "encrust": {
+        "path": "Database/Posting List/encrust.json",
+        "freq": 1
+    },
     "engag": {
         "path": "Database/Posting List/engag.json",
         "freq": 2
@@ -469,6 +485,10 @@
     },
     "enrich": {
         "path": "Database/Posting List/enrich.json",
+        "freq": 1
+    },
+    "entertain": {
+        "path": "Database/Posting List/entertain.json",
         "freq": 1
     },
     "environ": {
@@ -581,7 +601,7 @@
     },
     "from": {
         "path": "Database/Posting List/from.json",
-        "freq": 3
+        "freq": 4
     },
     "fun": {
         "path": "Database/Posting List/fun.json",
@@ -673,6 +693,10 @@
     },
     "headset": {
         "path": "Database/Posting List/headset.json",
+        "freq": 1
+    },
+    "heart": {
+        "path": "Database/Posting List/heart.json",
         "freq": 1
     },
     "help": {
@@ -781,7 +805,7 @@
     },
     "life": {
         "path": "Database/Posting List/life.json",
-        "freq": 3
+        "freq": 4
     },
     "like": {
         "path": "Database/Posting List/like.json",
@@ -1037,7 +1061,7 @@
     },
     "player": {
         "path": "Database/Posting List/player.json",
-        "freq": 10
+        "freq": 12
     },
     "pois": {
         "path": "Database/Posting List/pois.json",
@@ -1051,9 +1075,17 @@
         "path": "Database/Posting List/potenti.json",
         "freq": 1
     },
+    "pound": {
+        "path": "Database/Posting List/pound.json",
+        "freq": 1
+    },
     "power": {
         "path": "Database/Posting List/power.json",
         "freq": 4
+    },
+    "problem": {
+        "path": "Database/Posting List/problem.json",
+        "freq": 2
     },
     "profession": {
         "path": "Database/Posting List/profession.json",
@@ -1073,7 +1105,7 @@
     },
     "pump": {
         "path": "Database/Posting List/pump.json",
-        "freq": 1
+        "freq": 2
     },
     "purpos": {
         "path": "Database/Posting List/purpos.json",
@@ -1105,7 +1137,7 @@
     },
     "real": {
         "path": "Database/Posting List/real.json",
-        "freq": 2
+        "freq": 3
     },
     "realiti": {
         "path": "Database/Posting List/realiti.json",
@@ -1195,6 +1227,10 @@
         "path": "Database/Posting List/simul.json",
         "freq": 5
     },
+    "singl": {
+        "path": "Database/Posting List/singl.json",
+        "freq": 1
+    },
     "skill": {
         "path": "Database/Posting List/skill.json",
         "freq": 3
@@ -1210,6 +1246,10 @@
     "solar": {
         "path": "Database/Posting List/solar.json",
         "freq": 1
+    },
+    "solv": {
+        "path": "Database/Posting List/solv.json",
+        "freq": 2
     },
     "someth": {
         "path": "Database/Posting List/someth.json",

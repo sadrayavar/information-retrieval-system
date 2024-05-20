@@ -1,7 +1,6 @@
-import nltk
-from nltk.tokenize import word_tokenize
-from dependencies.common_funcs import lower, remove_symbol, stem
+from dependencies.common_funcs import pre_process
 
+# import nltk
 # nltk.download("punkt")
 
 
@@ -9,24 +8,16 @@ def doc_parser(path, log=False):
     if log:
         log("Started to execute doc_parser")
 
-    token_list = []
+    total_entity_list = []
 
     for doc_id in range(5):
         with open(f"{path}/{doc_id}.text", "r") as file:
-            # read file and pass it to the query_pre_proessor
-            temp_list = file.read()
-            temp_list = word_tokenize(temp_list)
-            temp_list = remove_symbol(temp_list)
-            temp_list = lower(temp_list)
-            temp_list = stem(temp_list)
+            # read file and pass it to the pre_proessor
+            entity_list = pre_process(file.read())
 
-            # creating token entity with token, doc_id, and tkn_pos keys
-            for i in range(len(temp_list)):
-                temp_list[i] = {
-                    "token": temp_list[i]["stemed"],
-                    "doc_id": doc_id,
-                    "tkn_pos": i,
-                    "base_token": temp_list[i]["base"],
-                }
-            token_list += temp_list
-    return token_list
+            # adding document id and token position to token entities
+            for i in range(len(entity_list)):
+                entity_list[i]["doc_id"] = doc_id
+                entity_list[i]["tkn_pos"] = i + 1
+            total_entity_list += entity_list
+    return total_entity_list

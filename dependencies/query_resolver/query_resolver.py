@@ -1,80 +1,18 @@
 import json
-from nltk.tokenize import word_tokenize
-from dependencies.find_recursive import FindRecursive
-from dependencies.common_funcs import lower, remove_symbol, stem
-from dependencies.query_resolver.handle_star.handle_star import resolve_wildcard
+from dependencies.common_funcs import pre_process
+from dependencies.query_resolver.resolve_operator import merge_dicts
+from dependencies.query_resolver.resolve_wildcard import match_wildcard, make_queries
 
 
 class QueryResolver:
-    results = {}
+    operators = ["AND", "OR", "NOT", "\\"]
+    search_wild = False
 
     def __init__(self, query, positional_index, wildcard_index, log):
         self.positional_index = positional_index
         self.wildcard_index = wildcard_index
         self.log = log
         self.query_parser(query)
-
-    def query_parser(self, query):
-        self.log(f"Starting to resolve:\t{query}")
-
-        result = []
-        tkn_list = self.my_tokenize(query)
-
-        for i in range(len(tkn_list)):
-            tkn = tkn_list[i]
-
-            if "*" in tkn:
-                # getting equivalance of the wildcard query
-                new_tkns = resolve_wildcard(tkn, self.wildcard_index)
-                self.log(f'Tokens retrieved for "{tkn}" are:\t{", ".join(new_tkns)}')
-
-                for new_tkn in new_tkns:
-
-                    # creating new token
-                    full_token = " ".join(tkn_list[:i])
-                    full_token += " " + new_tkn + " "
-                    full_token += " ".join(tkn_list[i + 1 :])
-                    full_token = full_token.strip()
-
-                    # resolve the query with new token
-                    result += self.query_parser(full_token)
-                    return
-
-            # ignores "AND" since its default operator is AND
-            if "AND" in tkn:
-                continue
-
-            if "OR" in tkn:
-                pass
-
-            tkn = word_tokenize(tkn)
-            tkn = remove_symbol(tkn)
-            tkn = lower(tkn)
-            tkn = [tkn["stemed"] for tkn in stem(tkn)]
-            result += tkn
-
-        return self.get_results(result)
-
-    def get_results(self, tkns):
-        content = {}
-
-        # load posting list contents
-        for tkn in tkns:
-            with open(self.positional_index[tkn]["path"], "r") as file:
-                content[tkn] = json.load(file)
-
-        for doc_id in range(5):
-            list_of_lists = []
-            for tkn in tkns:
-                if str(doc_id) in content[tkn]:
-                    list = content[tkn][str(doc_id)]
-                    list_of_lists.append(list)
-                else:
-                    list_of_lists = []
-                    break
-
-            if len(list_of_lists) > 0:
-                self.results[doc_id] = FindRecursive(list_of_lists).results
 
     def my_tokenize(self, sentence):
         tkn_list = []
@@ -88,3 +26,87 @@ class QueryResolver:
             else:
                 tkn += sentence[i]
         return tkn_list
+
+    def fill_ops(self, index, tkn_list):
+        # fill operator and second operand
+        if tkn_list[index] in self.operators:
+            operator = tkn_list[index]
+            right_oprnd = tkn_list[index + 1]
+        else:
+            operator = "AND"
+            right_oprnd = tkn_list[index]
+
+        return operator, right_oprnd
+
+    def posting_content(self, tkn):
+        try:
+            tkn_path = self.positional_index[tkn]["path"]
+            with open(tkn_path, "r") as file:
+                return json.load(file)
+        except:
+            return {}
+
+    ############################################################
+    ### main method
+    ############################################################
+    def query_parser(self, query):
+        query = self.my_tokenize(query)
+
+        # check if any wildcard tokens left on query
+        has_wild = False
+        for i in range(len(query)):
+            tkn = query[i]
+
+            if "*" in tkn:
+                self.search_wild = True
+                has_wild = True
+                terms = match_wildcard(tkn, self.wildcard_index)
+                self.log(f"\nFound wildcard token:\t{tkn} -> {terms}")
+                new_queries = make_queries(query, tkn_pos=i, terms=terms)
+                for new_query in new_queries:
+                    self.query_parser(new_query)
+        if has_wild:
+            return
+
+        """
+        resolve clean query (without wildcard)
+        """
+
+        # pre-process first token
+        first_tkn = pre_process(query[0])[0]["stem"]
+
+        # get the documetns that has first token
+        result = self.posting_content(first_tkn)
+
+        i = 1
+        while i < len(query):
+            is_oprtr = query[i] in self.operators
+
+            # extract right opearand and operator from query
+            operator, right_oprnd = self.fill_ops(i, query)
+
+            # pre-process right operand
+            right_oprnd = pre_process(right_oprnd)[0]["stem"]
+
+            # fix stepping if token is an operator
+            if is_oprtr:
+                i += 1
+
+            # main section which calculates the result
+            if operator == "\\":
+                pass
+            else:
+                right_content = self.posting_content(right_oprnd)
+                offset = (i - 1) if is_oprtr else i
+                result = merge_dicts(result, operator, right_content, offset)
+
+            # stop processing other tokens if there are no results for this tokens
+            if len(result) == 0:
+                if not self.search_wild:
+                    self.log(f'No results for -> "{" ".join(query)}"')
+                return
+
+            # increment step
+            i += 1
+
+        self.log(f'Results of "{" ".join(query)}" ->\t{result}')

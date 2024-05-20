@@ -1,4 +1,5 @@
 import os
+from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 
 
@@ -7,6 +8,9 @@ def delete_files(directory):
         # Create the full path to the file
         filepath = os.path.join(directory, filename)
         os.remove(filepath)
+
+
+# methods used in wildcard indexing
 
 
 def two_chars(tkn):
@@ -19,6 +23,18 @@ def two_chars(tkn):
     return two_char_list
 
 
+# methods used in text (document or query) pre-processing
+
+
+def pre_process(tkn_list):
+    tkn_list = word_tokenize(tkn_list)
+    tkn_list = remove_symbol(tkn_list)
+    tkn_list = lower(tkn_list)
+    tkn_list = stem(tkn_list)
+
+    return tkn_list
+
+
 def lower(tkn_list):
     return [tkn.lower() for tkn in tkn_list]
 
@@ -29,4 +45,4 @@ def remove_symbol(tkn_list):
 
 def stem(tkn_list):
     stm = PorterStemmer()
-    return [{"stemed": stm.stem(tkn), "base": tkn} for tkn in tkn_list]
+    return [{"stem": stm.stem(tkn), "base": tkn} for tkn in tkn_list]
