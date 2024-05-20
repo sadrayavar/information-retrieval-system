@@ -9,14 +9,14 @@ def delete_files(directory):
         os.remove(filepath)
 
 
-def two_words(tkn):
-    two_word_list = []
+def two_chars(tkn):
+    two_char_list = []
 
     for i in range(len(tkn) - 1):
         two_char = tkn[i] + tkn[i + 1]
-        two_word_list.append(two_char)
+        two_char_list.append(two_char)
 
-    return two_word_list
+    return two_char_list
 
 
 def lower(tkn_list):

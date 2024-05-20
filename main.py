@@ -1,8 +1,8 @@
 from dependencies.log import Log
-from dependencies.document_parser import doc_parser
-from dependencies.query_resolver import QueryResolver
-from dependencies.indexer import Indexer
-from dependencies.wildcard import KgramIndexer
+from dependencies.indexers.document_parser import doc_parser
+from dependencies.query_resolver.query_resolver import QueryResolver
+from dependencies.indexers.positional import PositionalIndexer
+from dependencies.indexers.wildcard import KgramIndexer
 
 
 class Main:
@@ -24,7 +24,7 @@ class Main:
         tokens = doc_parser(self.paths["document"], self.log)
 
         # index documents
-        self.positional = Indexer(
+        self.positional = PositionalIndexer(
             tokens, self.paths["posting"], self.paths["dict"], self.log
         ).result
 
@@ -33,13 +33,13 @@ class Main:
         # self.dict = indxr.dict
 
         # wildcard indexer
-        self.wildcard = KgramIndexer(
-            self.positional, self.paths["dict"], self.log
-        ).result
+        self.wildcard = KgramIndexer(tokens, self.paths["dict"], self.log).result
 
         while True:
             query = input("Please enter your query: ")
-            results = QueryResolver(query, self.positional).results
+            results = QueryResolver(
+                query, self.positional, self.wildcard, self.log
+            ).results
             print(results)
 
 

@@ -2,7 +2,7 @@ import nltk
 from nltk.tokenize import word_tokenize
 from dependencies.common_funcs import lower, remove_symbol, stem
 
-nltk.download("punkt")
+# nltk.download("punkt")
 
 
 def doc_parser(path, log=False):

@@ -2,7 +2,7 @@ import os, json
 from dependencies.common_funcs import delete_files
 
 
-class Indexer:
+class PositionalIndexer:
     """_summary_
 
     Args:
@@ -18,7 +18,7 @@ class Indexer:
 
     def __init__(self, tkn_list, post_dir, dict_path, log):
         self.log = log
-        log("Started to execute indexer")
+        log("Started to execute PositionalIndexer")
 
         # delete all of posting list files
         delete_files(post_dir)

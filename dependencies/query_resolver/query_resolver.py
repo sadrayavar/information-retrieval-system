@@ -1,24 +1,44 @@
 import json
 from nltk.tokenize import word_tokenize
 from dependencies.find_recursive import FindRecursive
-
-# from common_funcs import lower, remove_symbol, stem
 from dependencies.common_funcs import lower, remove_symbol, stem
+from dependencies.query_resolver.handle_star.handle_star import resolve_wildcard
 
 
 class QueryResolver:
     results = {}
 
-    def __init__(self, query, positional):
-        self.positional = positional
+    def __init__(self, query, positional_index, wildcard_index, log):
+        self.positional_index = positional_index
+        self.wildcard_index = wildcard_index
+        self.log = log
         self.query_parser(query)
 
     def query_parser(self, query):
+        self.log(f"Starting to resolve:\t{query}")
+
         result = []
         tkn_list = self.my_tokenize(query)
 
         for i in range(len(tkn_list)):
             tkn = tkn_list[i]
+
+            if "*" in tkn:
+                # getting equivalance of the wildcard query
+                new_tkns = resolve_wildcard(tkn, self.wildcard_index)
+                self.log(f'Tokens retrieved for "{tkn}" are:\t{", ".join(new_tkns)}')
+
+                for new_tkn in new_tkns:
+
+                    # creating new token
+                    full_token = " ".join(tkn_list[:i])
+                    full_token += " " + new_tkn + " "
+                    full_token += " ".join(tkn_list[i + 1 :])
+                    full_token = full_token.strip()
+
+                    # resolve the query with new token
+                    result += self.query_parser(full_token)
+                    return
 
             # ignores "AND" since its default operator is AND
             if "AND" in tkn:
@@ -40,7 +60,7 @@ class QueryResolver:
 
         # load posting list contents
         for tkn in tkns:
-            with open(self.positional[tkn]["path"], "r") as file:
+            with open(self.positional_index[tkn]["path"], "r") as file:
                 content[tkn] = json.load(file)
 
         for doc_id in range(5):
@@ -68,20 +88,3 @@ class QueryResolver:
             else:
                 tkn += sentence[i]
         return tkn_list
-
-    def convert_star(self, tkn):
-        first_part = ""
-        second_part = ""
-        for i in range(len(tkn)):
-            if tkn[i] == "*":
-                first_part = "$" + tkn[:i]
-                second_part = tkn[i + 1 :] + "$"
-                break
-        return (first_part, second_part)
-
-    def commons(self, first, second):
-        if len(first) == 0:
-            return second
-        elif len(second) == 0:
-            return first
-        return list(set(first) & set(second))
