@@ -14,12 +14,12 @@ def merge_dicts(dict1, operator, dict2, offset):
         if doc_id not in dict2:
             dict2[doc_id] = []
 
-        if operator == "AND":
+        if operator == "AND" or operator[0] == "\\":
             new_dict[doc_id] = and_lists(dict1[doc_id], offset, dict2[doc_id])
-        elif operator == "OR":
-            new_dict[doc_id] = or_lists(dict1[doc_id], offset, dict2[doc_id])
         elif operator == "NOT":
             new_dict[doc_id] = not_lists(dict1[doc_id], offset, dict2[doc_id])
+        elif operator == "OR":
+            new_dict[doc_id] = or_lists(dict1[doc_id], dict2[doc_id])
         else:
             print(f"Wrong operator: {operator}")
 
@@ -38,10 +38,6 @@ def not_lists(list1, offset, list2):
     return result
 
 
-def or_lists(list1, offset, list2):
-    return list(set(list1) | set(list2))
-
-
 def and_lists(list1, offset, list2):
     result = []
 
@@ -52,4 +48,10 @@ def and_lists(list1, offset, list2):
             elif i + offset < j:
                 break
 
+    return result
+
+
+def or_lists(list1, list2):
+    result = list(set(list1) | set(list2))
+    result.sort()
     return result

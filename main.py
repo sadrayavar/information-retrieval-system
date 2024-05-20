@@ -1,8 +1,8 @@
 from dependencies.log import Log
-from dependencies.indexers.document_parser import doc_parser
-from dependencies.query_resolver.query_resolver import QueryResolver
-from dependencies.indexers.positional import PositionalIndexer
-from dependencies.indexers.wildcard import KgramIndexer
+from dependencies.indexer.document_parser import doc_parser
+from dependencies.query.query_resolver import QueryResolver
+from dependencies.indexer.positional import PositionalIndexer
+from dependencies.indexer.wildcard import KgramIndexer
 
 
 class Main:
