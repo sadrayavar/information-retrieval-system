@@ -1,7 +1,6 @@
 from dependencies.common_funcs import pre_process
-
-# import nltk
-# nltk.download("punkt")
+import nltk
+nltk.download("punkt")
 
 
 def doc_parser(path, log=False):

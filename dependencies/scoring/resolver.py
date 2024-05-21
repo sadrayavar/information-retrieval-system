@@ -1,3 +1,4 @@
+from math import sqrt
 from dependencies.scoring.scoring import tf_idf, extract_posting
 from dependencies.common_funcs import pre_process
 
@@ -38,8 +39,8 @@ class RankedResolver:
         if top == 0:
             return 0
 
-        bottom_l = sum([value**2 for _, value in v1.items()])
-        bottom_r = sum([value**2 for _, value in v2.items()])
+        bottom_l = sqrt(sum([value**2 for _, value in v1.items()]))
+        bottom_r = sqrt(sum([value**2 for _, value in v2.items()]))
 
         return top / (bottom_l * bottom_r)
 
