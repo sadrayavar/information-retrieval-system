@@ -1,4 +1,35 @@
-from dependencies.common_funcs import remove_symbol, two_chars
+from dependencies.common_funcs import remove_symbol, two_chars, my_tokenizer
+
+
+class WildcardResolver:
+    queries = []
+
+    def __init__(self, query, wildcard_index, log):
+        self.wildcard_index = wildcard_index
+        self.log = log
+        self.recursive_resolver(my_tokenizer(query))
+
+    def recursive_resolver(self, tkn_list):
+        is_wild = False
+        for i in range(len(tkn_list)):
+            tkn = tkn_list[i]
+            if "*" in tkn:
+                is_wild = True
+
+                # matching wildcard with its terms
+                terms = match_wildcard(tkn, self.wildcard_index)
+                self.log(f'"{tkn}" matched with => {terms}')
+
+                # creating new queries with each matched term
+                new_queries = make_queries(tkn_list, tkn_pos=i, terms=terms)
+
+                # check generated queries for wildcard
+                for query in new_queries:
+                    self.recursive_resolver(my_tokenizer(query))
+
+        if not is_wild:
+            self.queries.append(" ".join(tkn_list))
+
 
 """it takes a term list, query, and a position which terms should be placesd and returns new query
 """
@@ -17,7 +48,7 @@ def make_queries(query, tkn_pos, terms):
     return new_queries
 
 
-"""it takse a wildcard token and returns a list of terms which match with that token
+"""it takes a wildcard token and returns a list of terms which matchs with that token
 """
 
 

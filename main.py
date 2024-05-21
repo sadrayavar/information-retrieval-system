@@ -1,13 +1,18 @@
+# genearal dependencies
 from dependencies.log import Log
+from dependencies.document_parser import doc_parser
+from dependencies.common_funcs import pre_process
 
-# positional and wildcarddependencies
-from dependencies.indexer.document_parser import doc_parser
-from dependencies.indexer.positional import PositionalIndexer
-from dependencies.indexer.wildcard import KgramIndexer
-from dependencies.query.query_resolver import QueryResolver
+# wildcard dependencies
+from dependencies.wildcard.indexer import KgramIndexer
+from dependencies.wildcard.resolver import WildcardResolver
+
+# positional dependencies
+from dependencies.boolean.indexer import PositionalIndexer
+from dependencies.boolean.resolver import BoolResolver
 
 # ranked dependencies
-from dependencies.scoring.scoring import get_vectors
+from dependencies.scoring.indexer import get_vectors
 from dependencies.scoring.resolver import RankedResolver
 
 
@@ -43,9 +48,12 @@ class Main:
 
         while True:
             print("\n#####################################")
-            query = input("Please enter your query: ").strip()
-            QueryResolver(query, self.positional, self.wildcard, self.log)
-            RankedResolver(query, self.positional, self.vectors, self.log)
+            input_query = input("Please enter your query: ").strip()
+
+            queries = WildcardResolver(input_query, self.wildcard, self.log).queries
+            for query in queries:
+                BoolResolver(query, self.positional, self.wildcard, self.log)
+                RankedResolver(query, self.positional, self.vectors, self.log)
 
 
 Main()

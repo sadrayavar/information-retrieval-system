@@ -1,6 +1,3 @@
-from unittest import result
-
-
 def merge_dicts(dict1, operator, dict2, offset):
     new_dict = {}
 

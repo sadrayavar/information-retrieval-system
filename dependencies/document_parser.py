@@ -1,5 +1,6 @@
 from dependencies.common_funcs import pre_process
 import nltk
+
 nltk.download("punkt")
 
 
@@ -12,7 +13,7 @@ def doc_parser(path, log=False):
     for doc_id in range(5):
         with open(f"{path}/{doc_id}.text", "r") as file:
             # read file and pass it to the pre_proessor
-            entity_list = pre_process(file.read())
+            entity_list = pre_process(file.read(), return_base=True)
 
             # adding document id and token position to token entities
             for i in range(len(entity_list)):

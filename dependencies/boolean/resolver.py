@@ -1,69 +1,16 @@
-import json
-from dependencies.common_funcs import pre_process
-from dependencies.query.resolve_operator import merge_dicts
-from dependencies.query.resolve_wildcard import match_wildcard, make_queries
+from dependencies.common_funcs import get_content, my_tokenizer
+from dependencies.boolean.operations import merge_dicts
 
 
-class QueryResolver:
+class BoolResolver:
     operators = ["AND", "OR", "NOT", "\\"]
 
     def __init__(self, query, positional_index, wildcard_index, log):
         self.positional_index = positional_index
         self.wildcard_index = wildcard_index
         self.log = log
-        self.query_parser(query)
-
-    def my_tokenize(self, sentence):
-        tkn_list = []
-        tkn = ""
-        for i in range(len(sentence) + 1):
-            word_finished = i == len(sentence)
-            if word_finished or sentence[i] == " ":
-                if tkn != "":
-                    tkn_list.append(tkn)
-                    tkn = ""
-            else:
-                tkn += sentence[i]
-        return tkn_list
-
-    def get_content(self, base_tkn):
-        try:
-            if not isinstance(base_tkn, dict):
-                # pre-process
-                stem = pre_process(base_tkn)[0]["stem"]
-
-                tkn_path = self.positional_index[stem]["path"]
-                with open(tkn_path, "r") as file:
-                    return json.load(file)
-            else:
-                return base_tkn
-        except:
-            self.log(
-                f'There are no instance of "{stem}" in positional dictionary', "ERROR"
-            )
-            return {}
-
-    def clean_wild(self, query):
-        has_wild = False
-
-        for i in range(len(query)):
-            tkn = query[i]
-
-            if "*" in tkn:
-                has_wild = True
-
-                # matching wildcard with its terms
-                terms = match_wildcard(tkn, self.wildcard_index)
-                self.log(f"\nFound wildcard token:\t{tkn} -> {terms}")
-
-                # creating new queries with each matched term
-                new_queries = make_queries(query, tkn_pos=i, terms=terms)
-
-                # resolve each new query
-                for new_query in new_queries:
-                    self.query_parser(new_query)
-
-        return {"has_wild": has_wild}
+        self.log_query = query
+        self.query_parser(my_tokenizer(query))
 
     def extract_operator(self, query, tkn):
         if isinstance(tkn, str):
@@ -83,23 +30,10 @@ class QueryResolver:
     ### main method
     ############################################################
     def query_parser(self, query):
-        log_query = query
-        self.log(f"\n\nProcessing query:\t{log_query}")
+        self.log(f"\n\nProcessing query:\t{self.log_query}")
 
         """
-        Handle *
-        """
-        query = self.my_tokenize(query)
-
-        # check if any wildcard tokens left on query
-        result = self.clean_wild(query)
-
-        # stop processing query if it has wildcard in it
-        if result["has_wild"]:
-            return
-
-        """
-        Handle OR
+        resolve OR
         """
 
         new_query = []
@@ -118,8 +52,8 @@ class QueryResolver:
                 right = query[i + 1]
 
                 # pre-process left and right operands and get the posting list content
-                left = self.get_content(left)
-                right = self.get_content(right)
+                left = get_content(self.positional_index, left, self.log)
+                right = get_content(self.positional_index, right, self.log)
 
                 # resolve with or operator
                 result = merge_dicts(left, "OR", right, 0)
@@ -133,11 +67,11 @@ class QueryResolver:
         query = query if len(query) == 0 else new_query
 
         """
-        Handle AND, NOT, \\N
+        resolve AND, NOT, \\N
         """
 
         # pre-process first token and get the posting list content
-        result = self.get_content(query[0])
+        result = get_content(self.positional_index, query[0], self.log)
 
         # process multi-term queries
         query = query[1:]
@@ -149,7 +83,7 @@ class QueryResolver:
             oprtr, query, tkn = self.extract_operator(query, tkn)
 
             # pre-process and get the documents that has the right operand in them
-            oprnd = self.get_content(tkn)
+            oprnd = get_content(self.positional_index, tkn, self.log)
 
             # calculating offset
             if oprtr[0] == "\\":
@@ -160,7 +94,7 @@ class QueryResolver:
 
             # stop processing other tokens if there are no results for this tokens
             if len(result) == 0:
-                self.log(f"No results found for {log_query}")
+                self.log(f"No results found for {self.log_query}")
                 return
 
             # increment

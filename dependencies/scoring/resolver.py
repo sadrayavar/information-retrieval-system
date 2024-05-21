@@ -1,5 +1,5 @@
 from math import sqrt
-from dependencies.scoring.scoring import tf_idf, extract_posting
+from dependencies.scoring.indexer import tf_idf, extract_posting
 from dependencies.common_funcs import pre_process
 
 
@@ -56,8 +56,6 @@ class RankedResolver:
         vector = {}
 
         for tkn in tkns:
-            tkn = tkn["stem"]
-
             if tkn not in vector:
                 # extracting posting list
                 if tkn in self.pos_dict:
@@ -75,7 +73,6 @@ class RankedResolver:
     def get_tf(self, tkns):
         TF = {}
         for tkn in tkns:
-            tkn = tkn["stem"]
             if tkn not in TF:
                 TF[tkn] = 0
             TF[tkn] += 1
