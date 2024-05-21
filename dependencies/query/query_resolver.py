@@ -26,22 +26,6 @@ class QueryResolver:
                 tkn += sentence[i]
         return tkn_list
 
-    def fill_ops(self, first_tkn, second_tkn):
-        if (
-            first_tkn == "NOT"  # NOT tkn
-            or first_tkn == "AND"  # AND tkn
-            or (isinstance(first_tkn, str) and first_tkn[0] == "\\")  # \N tkn
-        ):
-            operator = first_tkn
-            operand = second_tkn
-            step = 2
-        else:  # tkn tkn
-            operator = "AND"
-            operand = first_tkn
-            step = 1
-
-        return operator, operand, step
-
     def get_content(self, base_tkn):
         try:
             if not isinstance(base_tkn, dict):
@@ -54,6 +38,9 @@ class QueryResolver:
             else:
                 return base_tkn
         except:
+            self.log(
+                f'There are no instance of "{stem}" in positional dictionary', "ERROR"
+            )
             return {}
 
     def clean_wild(self, query):
@@ -78,10 +65,27 @@ class QueryResolver:
 
         return {"has_wild": has_wild}
 
+    def extract_operator(self, query, tkn):
+        if isinstance(tkn, str):
+            tkn_is_oprtr = ("NOT" in tkn) or ("AND" in tkn) or ("\\" in tkn)
+            if tkn_is_oprtr:
+                oprtr = tkn
+                query = query[1:]
+                tkn = query[0]
+            else:
+                oprtr = "AND"
+        else:
+            self.log("This token is not a string", "ERROR")
+
+        return oprtr, query, tkn
+
     ############################################################
     ### main method
     ############################################################
     def query_parser(self, query):
+        log_query = query
+        self.log(f"\n\nProcessing query:\t{log_query}")
+
         """
         Handle *
         """
@@ -135,31 +139,33 @@ class QueryResolver:
         # pre-process first token and get the posting list content
         result = self.get_content(query[0])
 
-        i = 1
-        while i < len(query):
-            # extract right opearand and operator from query
-            if len(query) > 2:
-                operator, right_oprnd, step = self.fill_ops(query[i], query[i + 1])
-            else:
-                operator, right_oprnd, step = "AND", query[-1], 1
+        # process multi-term queries
+        query = query[1:]
+        offset = 1
+        while len(query) > 0:
+            tkn = query[0]
 
-            # pre-process and get the documents that has the right side token in them
-            right_content = self.get_content(right_oprnd)
+            # extract operator from query
+            oprtr, query, tkn = self.extract_operator(query, tkn)
+
+            # pre-process and get the documents that has the right operand in them
+            oprnd = self.get_content(tkn)
 
             # calculating offset
-            offset = i
-            if operator[0] == "\\":
-                offset += int(operator[1:]) - 2
+            if oprtr[0] == "\\":
+                offset += int(oprtr[1:]) - 2
 
             # calculating results
-            result = merge_dicts(result, operator, right_content, offset)
+            result = merge_dicts(result, oprtr, oprnd, offset)
 
             # stop processing other tokens if there are no results for this tokens
             if len(result) == 0:
-                self.log(f"No results found")
+                self.log(f"No results found for {log_query}")
                 return
 
-            # increment step
-            i += step
+            # increment
+            query = query[1:]
+            offset += 1
 
-        self.log(f"Results ->\t{result}")
+        # sort and show the results
+        self.log(f"Results ->\t{dict(sorted(result.items()))}")

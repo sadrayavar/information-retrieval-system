@@ -1,33 +1,21 @@
 # information-retrieval-system
 
-part 1:
+query rules:
 
-- Positional index implementation
-- 5 files with 10 lines at least
+    - operators: AND, NOT, OR, \\N
 
-part 2:
+    - the left operand is always considered a sentence
+    - the right operand is always considered a word
 
-- wildcard indexer implementation
-- compound part one and two together
+    - SENTENCE AND WORD ==> the documents which has the "sentence + word" sentence in them
+        - ali va hasan AND came == ali va hasan came
 
-plus:
+    - SENTENCE OR WORD ==> ?
+        - ali va hasan OR came == ali va (hasan OR came)
 
-- ranking with tf-idf
+    - SENTENCE NOT WORD ==> the document which have the SENTENCE in them except those who has WORD just after the SENTENCE
+        - ali va hasan NOT came == (ali va hasan) - (ali va hasan came)
 
-( SPELL(moriset) /3 toron\*to )
+    - SENTENCE \\5 WORD ==> same as: SENTENCE AND WORD (with 5-2 offset)
 
-queries to process:
-
-    - a (done)
-    - video game (done)
-    - video AND game (done)
-    - games, (done)
-    - ,games (done)
-    - video OR game
-    - video NOT game
-    - games \\4 border
-    - ga\*
-    - \*es
-    - ga\*es
-    - ga\*es have
-    - games \\4 bo\*
+    - no symbols beside operators

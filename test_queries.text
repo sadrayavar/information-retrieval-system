@@ -1,0 +1,40 @@
+############## capitilizing
+video GAME
+
+############## symbols
+video, game, have. transcended; border:
+
+############## word form
+videos gaming having transcend bordered
+
+
+
+############## AND
+video game
+video AND games AND have AND transcended
+video game universe
+
+############## OR
+video OR behaviour
+
+############## NOT
+video NOT game
+
+
+
+############## positional
+video \7 demograph
+
+
+
+############## wildcard
+ga*
+*eo
+d*y
+
+
+
+############## compound
+*eo AND game have OR universe
+*eo AND game have OR universe NOT wait
+*eo AND game have OR universe \3 border
