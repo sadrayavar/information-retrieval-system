@@ -24,9 +24,6 @@ class Main:
     }
 
     def __init__(self):
-        # asking for IR system mode
-        mode = input('Enter "r" for ranked retrieval or "b" for boolean retrieval: ')
-
         # initializing logging system
         self.log = Log(self.paths["log"]).log
 
@@ -42,16 +39,13 @@ class Main:
         self.wildcard = KgramIndexer(tkns_entity, self.paths["dict"], self.log).result
 
         # tf-idf scoring
-        self.vectors = get_vectors(self.positional)
+        self.vectors = get_vectors(self.positional, self.paths["dict"])
 
         while True:
             print("\n#####################################")
             query = input("Please enter your query: ").strip()
-
-            if mode == "b":
-                QueryResolver(query, self.positional, self.wildcard, self.log)
-            else:
-                RankedResolver(query, self.positional, self.vectors, self.log)
+            QueryResolver(query, self.positional, self.wildcard, self.log)
+            RankedResolver(query, self.positional, self.vectors, self.log)
 
 
 Main()

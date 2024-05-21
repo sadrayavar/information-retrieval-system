@@ -1,7 +1,8 @@
+import json
 from dependencies.common_funcs import extract_posting, tf_idf
 
 
-def get_vectors(positional_dict):
+def get_vectors(positional_dict, dict_path):
     vectors = {}
     for doc_id in range(5):
         doc_id = str(doc_id)
@@ -16,5 +17,9 @@ def get_vectors(positional_dict):
             vector[tkn] = tf_idf(tf, df, 5)
 
         vectors[doc_id] = vector
+
+    # create file
+    with open(f"{dict_path}/document_vectors.json", "w") as file:
+        json.dump(vectors, file, indent=4)
 
     return vectors
