@@ -12,15 +12,15 @@ def delete_files(directory):
 
 def get_content(pos_index, base_tkn, log):
     try:
-        if not isinstance(base_tkn, dict):
+        if isinstance(base_tkn, dict):
+            return base_tkn
+        else:
             # pre-process
             stem = pre_process(base_tkn)[0]
 
             tkn_path = pos_index[stem]["path"]
             with open(tkn_path, "r") as file:
                 return json.load(file)
-        else:
-            return base_tkn
     except:
         log(f'There are no instance of "{stem}" in positional dictionary', "ERROR")
         return {}

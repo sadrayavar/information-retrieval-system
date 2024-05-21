@@ -12,7 +12,9 @@ class BoolResolver:
         self.log_query = query
         self.query_parser(my_tokenizer(query))
 
-    def extract_operator(self, query, tkn):
+    def extract_operator(self, query):
+        tkn = query[0]
+
         if isinstance(tkn, str):
             tkn_is_oprtr = ("NOT" in tkn) or ("AND" in tkn) or ("\\" in tkn)
             if tkn_is_oprtr:
@@ -21,10 +23,11 @@ class BoolResolver:
                 tkn = query[0]
             else:
                 oprtr = "AND"
+
+            return oprtr, query, tkn
         else:
             self.log("This token is not a string", "ERROR")
-
-        return oprtr, query, tkn
+            return "AND", query, tkn
 
     ############################################################
     ### main method
@@ -80,7 +83,7 @@ class BoolResolver:
             tkn = query[0]
 
             # extract operator from query
-            oprtr, query, tkn = self.extract_operator(query, tkn)
+            oprtr, query, tkn = self.extract_operator(query)
 
             # pre-process and get the documents that has the right operand in them
             oprnd = get_content(self.positional_index, tkn, self.log)
@@ -94,7 +97,7 @@ class BoolResolver:
 
             # stop processing other tokens if there are no results for this tokens
             if len(result) == 0:
-                self.log(f"No results found for {self.log_query}")
+                self.log(f'No results found for => "{self.log_query}"')
                 return
 
             # increment
