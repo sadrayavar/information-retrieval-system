@@ -1,4 +1,4 @@
-import os
+import os, math, json
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 
@@ -26,8 +26,8 @@ def two_chars(tkn):
 # methods used in text (document or query) pre-processing
 
 
-def pre_process(tkn_list):
-    tkn_list = word_tokenize(tkn_list)
+def pre_process(query):
+    tkn_list = word_tokenize(query)
     tkn_list = remove_symbol(tkn_list)
     tkn_list = lower(tkn_list)
     tkn_list = stem(tkn_list)
@@ -46,3 +46,24 @@ def remove_symbol(tkn_list):
 def stem(tkn_list):
     stm = PorterStemmer()
     return [{"stem": stm.stem(tkn), "base": tkn} for tkn in tkn_list]
+
+
+# methods used in scoring
+
+
+def extract_posting(path):
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+    except:
+        print("No posting files with this path:", path)
+
+
+def tf_idf(tf, df, n):
+    if tf == 0:
+        return 0.0
+
+    tfw = 1 + math.log(tf, 10)
+    idf = math.log(n / df, 10)
+
+    return tfw * idf

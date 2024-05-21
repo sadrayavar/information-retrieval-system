@@ -1,13 +1,20 @@
 from dependencies.log import Log
+
+# positional and wildcarddependencies
 from dependencies.indexer.document_parser import doc_parser
-from dependencies.query.query_resolver import QueryResolver
 from dependencies.indexer.positional import PositionalIndexer
 from dependencies.indexer.wildcard import KgramIndexer
+from dependencies.query.query_resolver import QueryResolver
+
+# ranked dependencies
+from dependencies.scoring.scoring import get_vectors
+from dependencies.scoring.resolver import RankedResolver
 
 
 class Main:
     positional = {}
     wildcard = {}
+    vectors = {}
     paths = {
         "document": "Database/Documents",
         "log": "Database/Logs",
@@ -17,6 +24,9 @@ class Main:
     }
 
     def __init__(self):
+        # asking for IR system mode
+        mode = input('Enter "r" for ranked retrieval or "b" for boolean retrieval: ')
+
         # initializing logging system
         self.log = Log(self.paths["log"]).log
 
@@ -31,10 +41,17 @@ class Main:
         # wildcard indexer
         self.wildcard = KgramIndexer(tkns_entity, self.paths["dict"], self.log).result
 
+        # tf-idf scoring
+        self.vectors = get_vectors(self.positional)
+
         while True:
             print("\n#####################################")
             query = input("Please enter your query: ").strip()
-            QueryResolver(query, self.positional, self.wildcard, self.log)
+
+            if mode == "b":
+                QueryResolver(query, self.positional, self.wildcard, self.log)
+            else:
+                RankedResolver(query, self.positional, self.vectors, self.log)
 
 
 Main()
