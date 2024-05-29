@@ -27,15 +27,15 @@ class PositionalIndexer:
             stem = tkn_entity["stem"]
             doc_id = tkn_entity["doc_id"]
             tkn_pos = tkn_entity["tkn_pos"]
-            post_file = f"{post_dir}/{stem}.json"
+            file_path = f"{post_dir}/{stem}.json"
 
             # create index
-            self.create_index(stem, post_file)
+            self.create_index(stem, file_path)
 
             # create posting list
-            self.create_posting(str(doc_id), tkn_pos, post_file)
+            self.create_posting(str(doc_id), tkn_pos, file_path)
 
-        # create file
+        # create index file
         with open(f"{dict_path}/positional.json", "w") as file:
             json.dump(self.result, file, indent=4)
 
@@ -44,11 +44,11 @@ class PositionalIndexer:
         if token not in self.result:
             self.result[token] = {"path": post_file, "freq": 0}
 
-        # sort dictionary
-        self.result = dict(sorted(self.result.items()))
-
         # increase frequency of term in dictionary
         self.result[token]["freq"] += 1
+
+        # sort dictionary
+        self.result = dict(sorted(self.result.items()))
 
     def create_posting(self, doc_id, tkn_pos, post_path):
         # create posting file (if ir does not exist)

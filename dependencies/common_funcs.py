@@ -25,6 +25,13 @@ def get_content(pos_index, base_tkn, log):
         log(f'There are no instance of "{stem}" in positional dictionary', "ERROR")
         return {}
 
+def extract_posting(path):
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+    except:
+        print("No posting files with this path:", path)
+
 
 def my_tokenizer(query):
     tkn_list = []
@@ -86,13 +93,6 @@ def stem(tkn_list, return_base):
 
 # methods used in scoring
 
-
-def extract_posting(path):
-    try:
-        with open(path, "r") as file:
-            return json.load(file)
-    except:
-        print("No posting files with this path:", path)
 
 
 def tf_idf(tf, df, n):

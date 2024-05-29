@@ -1,7 +1,7 @@
 # genearal dependencies
+import os
 from dependencies.log import Log
 from dependencies.document_parser import doc_parser
-from dependencies.common_funcs import pre_process
 
 # wildcard dependencies
 from dependencies.wildcard.indexer import KgramIndexer
@@ -17,9 +17,6 @@ from dependencies.scoring.resolver import RankedResolver
 
 
 class Main:
-    positional = {}
-    wildcard = {}
-    vectors = {}
     paths = {
         "document": "Database/Documents",
         "log": "Database/Logs",
@@ -36,24 +33,31 @@ class Main:
         tkns_entity = doc_parser(self.paths["document"], self.log)
 
         # index documents
-        self.positional = PositionalIndexer(
+        positional = PositionalIndexer(
             tkns_entity, self.paths["posting"], self.paths["dict"], self.log
         ).result
 
         # wildcard indexer
-        self.wildcard = KgramIndexer(tkns_entity, self.paths["dict"], self.log).result
+        wildcard = KgramIndexer(tkns_entity, self.paths["dict"], self.log).result
 
         # tf-idf scoring
-        self.vectors = get_vectors(self.positional, self.paths["dict"])
+        vectors = get_vectors(positional, self.paths["dict"])
 
         while True:
-            print("\n#####################################")
-            input_query = input("Please enter your query: ").strip()
+            input_query = input('Please enter your query (or "clear" to clear terminal): ').strip()
+            if input_query=='clear':
+                os.system('clear')
+                continue
 
-            queries = WildcardResolver(input_query, self.wildcard, self.log).queries
+            queries = WildcardResolver(input_query, wildcard, self.log).queries
             for query in queries:
-                BoolResolver(query, self.positional, self.wildcard, self.log)
-                RankedResolver(query, self.positional, self.vectors, self.log)
+                BoolResolver(query, positional, wildcard, self.log)
+                RankedResolver(query, positional, vectors, self.log)
+
+                # print a line
+                terminal_width = os.get_terminal_size()[0]
+                line = ''.join(['=' for i in range(terminal_width)])
+                print(f"\n{line}\n")
 
 
 Main()

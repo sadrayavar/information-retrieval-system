@@ -33,7 +33,7 @@ class BoolResolver:
     ### main method
     ############################################################
     def query_parser(self, query):
-        self.log(f"\n\nProcessing query:\t{self.log_query}")
+        self.log(f"Processing query:\t{self.log_query}")
 
         """
         resolve OR
@@ -105,4 +105,6 @@ class BoolResolver:
             offset += 1
 
         # sort and show the results
+        print()
         self.log(f"Results ->\t{dict(sorted(result.items()))}")
+        print()

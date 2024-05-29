@@ -30,9 +30,6 @@ class RankedResolver:
         # sort and return the dictionary
         return dict(sorted(sim_dict.items(), key=lambda item: item[1]))
 
-    def sort_dict(self, dict):
-        return
-
     def cos_sim(self, v1, v2):
         top = self.dot_product(v1, v2)
 

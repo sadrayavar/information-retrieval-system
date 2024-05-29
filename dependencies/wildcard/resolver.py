@@ -2,9 +2,9 @@ from dependencies.common_funcs import remove_symbol, two_chars, my_tokenizer
 
 
 class WildcardResolver:
-    queries = []
 
     def __init__(self, query, wildcard_index, log):
+        self.queries = []
         self.wildcard_index = wildcard_index
         self.log = log
         self.recursive_resolver(my_tokenizer(query))
@@ -18,7 +18,7 @@ class WildcardResolver:
 
                 # matching wildcard with its terms
                 terms = match_wildcard(tkn, self.wildcard_index)
-                self.log(f'"{tkn}" matched with => {terms}')
+                self.log(f'"{tkn}" matched with => {terms}\n\n')
 
                 # creating new queries with each matched term
                 new_queries = make_queries(tkn_list, tkn_pos=i, terms=terms)
@@ -80,8 +80,11 @@ def common_terms(two_chars, index):
     results = []
 
     for two_char in two_chars:
-        tkns = index[two_char]
-        results = list(set(results) & set(tkns)) if (len(results) != 0) else list(tkns)
-        results.sort()
+        if two_char in index:
+            tkns = index[two_char]
+            results = list(set(results) & set(tkns)) if (len(results) != 0) else list(tkns)
+            results.sort()
+        else:
+            return []
 
     return results

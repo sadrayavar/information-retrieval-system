@@ -3,12 +3,12 @@ from dependencies.common_funcs import two_chars
 
 
 class KgramIndexer:
-    result = {}
 
-    def __init__(self, tkns_entity, dict_path, log):
+    def __init__(self, tkn_entities, dict_path, log):
+        self.result = {}
         self.log = log
 
-        for tkn_entity in tkns_entity:
+        for tkn_entity in tkn_entities:
             base = tkn_entity["base"]
 
             for two_char in two_chars(f"${base}$"):

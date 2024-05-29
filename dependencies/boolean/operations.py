@@ -20,7 +20,7 @@ def merge_dicts(dict1, operator, dict2, offset):
         else:
             print(f"Wrong operator: {operator}")
 
-    # remove empty pairs
+    # remove empty pairs and return results
     return {key: value for key, value in new_dict.items() if value != []}
 
 
